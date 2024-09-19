@@ -1,132 +1,110 @@
-# Enable zsh profiling for performance analysis
-zmodload zsh/zprof
+# Path to your oh-my-zsh installation
+export ZSH="$HOME/.oh-my-zsh"
 
-# History settings
-HISTSIZE=2000
-SAVEHIST=2000
-HISTFILE=~/.zsh_history
-setopt HIST_IGNORE_ALL_DUPS
-setopt HIST_SAVE_NO_DUPS
-setopt HIST_REDUCE_BLANKS
-setopt INC_APPEND_HISTORY_TIME
+# Disable the default Oh My Zsh theme to use Starship
+ZSH_THEME=""
 
-# Zsh-specific window size check (replacement for bash's checkwinsize)
-function resize() {
-  eval "$(/usr/bin/env - PATH="$PATH" which resize)"
-}
-trap resize WINCH
+# Disable bi-weekly auto-update checks
+DISABLE_AUTO_UPDATE="true"
+DISABLE_UPDATE_PROMPT="true"
 
-# Enable caching for faster command lookup
-zstyle ':completion:*' use-cache on
-zstyle ':completion:*' cache-path ~/.zsh_cache
+# Plugins
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting fzf zsh-completions)
 
-# Lazy-load completions for faster startup
-autoload -Uz compinit
-if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
-  compinit
+# Source Oh My Zsh
+source $ZSH/oh-my-zsh.sh
+
+# User configuration
+export LANG=en_US.UTF-8
+
+# Preferred editor for local and remote sessions
+if [[ -n $SSH_CONNECTION ]]; then
+  export EDITOR='vim'
 else
-  compinit -C
+  export EDITOR='mvim'
 fi
 
-# Use zinit for plugin management
-ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-[ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
-[ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
-source "${ZINIT_HOME}/zinit.zsh"
-
-# Load essential plugins
-zinit ice wait lucid atload'_zsh_autosuggest_start'
-zinit light zsh-users/zsh-autosuggestions
-
-zinit ice wait lucid
-zinit light zdharma-continuum/fast-syntax-highlighting
-
-zinit ice wait lucid
-zinit light zsh-users/zsh-completions
-
-# Load fzf for file finding (if installed)
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-# Color support for ls and grep
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-fi
+# Compilation flags
+export ARCHFLAGS="-arch x86_64"
 
 # Aliases
-alias l='ls --color'
-alias ls='ls --color'
+alias zshconfig="$EDITOR ~/.zshrc"
+alias ohmyzsh="$EDITOR ~/.oh-my-zsh"
+
+# Custom aliases
+alias zshconfig="$EDITOR ~/.zshrc"
+alias ohmyzsh="$EDITOR ~/.oh-my-zsh"
+alias update='sudo apt update && sudo apt upgrade -y'
+alias c='clear'
+alias h='history'
 alias ll='ls -alF'
 alias la='ls -A'
-alias vi='nvim'
-alias c='clear'
-alias car='cargo run'
-alias ca='conda activate'
-alias cap='conda activate primary'
+alias l='ls -CF'
+alias car="cargo run -q"
+alias ca="conda activate"
+alias e="exit"
+alias n="nvim"
+alias gc="git clone"
 
-# Alert alias for long running commands
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
-# Source bash aliases if exists
-if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
+# Enable command-not-found if available
+if [ -f /etc/zsh_command_not_found ]; then
+    . /etc/zsh_command_not_found
 fi
 
-# Conda initialization (only if needed)
-__conda_setup="$('/home/shred/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/home/shred/anaconda3/etc/profile.d/conda.sh" ]; then
-        . "/home/shred/anaconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/home/shred/anaconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
+# Enable completion caching
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path ~/.zsh/cache
 
-# Add Cargo to PATH
-. "$HOME/.cargo/env"
+# # Faster completion
+# zstyle ':completion:*' accept-exact '*(N)'
+# zstyle ':completion:*' use-ip true
 
-# Disable unused features
-unsetopt CASE_GLOB
-setopt NO_BEEP
+# Case-insensitive completion
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 
-# Initialize Starship prompt
-eval "$(starship init zsh)"
+# Enable menu selection for completion
+zstyle ':completion:*' menu select=interactive
 
-# Environment variables
-export PATH=$HOME/.local/bin:$PATH
+# History settings
+HISTSIZE=10000
+SAVEHIST=10000
+setopt SHARE_HISTORY
+setopt APPEND_HISTORY
 
-# Rust-related environment variables
-export RUSTC_WRAPPER=""
-export RUST_BACKTRACE=1
 
-# Editor-related environment variables
-export EDITOR="code"
-export VISUAL="code"
+# FZF configuration
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# Ensure local bin directories are in PATH
-export PATH="$HOME/.cargo/bin:$PATH"
-export PATH="$HOME/.local/bin:$PATH"
 
-# Add Cursor editor to PATH if it exists
-if [ -d "$HOME/.cursor/bin" ]; then
-    export PATH="$HOME/.cursor/bin:$PATH"
-fi
-
-# Add any other custom environment variables or PATH additions here
-
-# Function to reload zsh configuration
-function reload_zsh() {
-    source ~/.zshrc
-    echo "ZSH config reloaded!"
+# Conda initialization (lazy-loaded)
+conda_init() {
+  __conda_setup="$('/home/shred/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+  if [ $? -eq 0 ]; then
+      eval "$__conda_setup"
+  else
+      if [ -f "/home/shred/anaconda3/etc/profile.d/conda.sh" ]; then
+          . "/home/shred/anaconda3/etc/profile.d/conda.sh"
+      else
+          export PATH="/home/shred/anaconda3/bin:$PATH"
+      fi
+  fi
+  unset __conda_setup
 }
 
-# Load any local customizations
-if [ -f ~/.zshrc.local ]; then
-    source ~/.zshrc.local
-fi
+# Lazy-load conda
+conda() {
+  unfunction "$0"
+  conda_init
+  $0 "$@"
+}
+
+
+. "$HOME/.cargo/env"
+
+
+# Add Docker Desktop to PATH
+# export PATH=$PATH:/opt/docker-desktop/bin
+
+# Starship prompt initialization
+eval "$(starship init zsh)"
