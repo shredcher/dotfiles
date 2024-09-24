@@ -45,6 +45,7 @@ alias ca="conda activate"
 alias e="exit"
 alias n="nvim"
 alias gc="git clone"
+alias pearai='PearAI'
 
 
 # Enable command-not-found if available
@@ -108,3 +109,6 @@ conda() {
 
 # Starship prompt initialization
 eval "$(starship init zsh)"
+
+
+export PATH=$HOME/.local/bin:$PATH
