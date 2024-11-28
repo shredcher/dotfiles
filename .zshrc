@@ -4,54 +4,27 @@ export ZSH="$HOME/.oh-my-zsh"
 # Disable the default Oh My Zsh theme to use Starship
 ZSH_THEME=""
 
-# Disable bi-weekly auto-update checks
-DISABLE_AUTO_UPDATE="true"
-DISABLE_UPDATE_PROMPT="true"
-
 # Plugins
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting fzf zsh-completions)
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-completions)
 
 # Source Oh My Zsh
 source $ZSH/oh-my-zsh.sh
 
-# User configuration
-export LANG=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='vim'
-else
-  export EDITOR='mvim'
-fi
-
-# Compilation flags
-export ARCHFLAGS="-arch x86_64"
-
 # Aliases
-alias zshconfig="$EDITOR ~/.zshrc"
-alias ohmyzsh="$EDITOR ~/.oh-my-zsh"
-
-# Custom aliases
-alias zshconfig="$EDITOR ~/.zshrc"
-alias ohmyzsh="$EDITOR ~/.oh-my-zsh"
 alias update='sudo apt update && sudo apt upgrade -y'
 alias c='clear'
 alias h='history'
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
-alias car="cargo run -q"
 alias ca="conda activate"
+alias cap="conda activate primary"
 alias e="exit"
 alias n="nvim"
 alias gc="git clone"
-alias pearai='PearAI'
 
-
-# Enable command-not-found if available
-if [ -f /etc/zsh_command_not_found ]; then
-    . /etc/zsh_command_not_found
-fi
+# rust alias
+alias car="cargo run -q"
 
 # Enable completion caching
 zstyle ':completion:*' use-cache on
@@ -72,10 +45,6 @@ HISTSIZE=10000
 SAVEHIST=10000
 setopt SHARE_HISTORY
 setopt APPEND_HISTORY
-
-
-# FZF configuration
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 
 # Conda initialization (lazy-loaded)
@@ -104,10 +73,6 @@ conda() {
 . "$HOME/.cargo/env"
 
 
-# Add Docker Desktop to PATH
-# export PATH=$PATH:/opt/docker-desktop/bin
-
-# Starship prompt initialization
 eval "$(starship init zsh)"
 
 
