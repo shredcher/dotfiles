@@ -47,9 +47,8 @@ setopt SHARE_HISTORY
 setopt APPEND_HISTORY
 
 
-# Conda initialization (lazy-loaded)
 conda_init() {
-  __conda_setup="$('/home/shred/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_setup="$('/home/shred/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
   if [ $? -eq 0 ]; then
       eval "$__conda_setup"
   else
@@ -61,6 +60,7 @@ conda_init() {
   fi
   unset __conda_setup
 }
+
 
 # Lazy-load conda
 conda() {
@@ -77,3 +77,6 @@ eval "$(starship init zsh)"
 
 
 export PATH=$HOME/.local/bin:$PATH
+export PATH="$HOME/.cargo/bin:$PATH"
+
+[[ "$TERM_PROGRAM" == "vscode" ]] && unset ARGV0
